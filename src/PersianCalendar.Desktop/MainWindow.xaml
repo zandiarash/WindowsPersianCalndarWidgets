@@ -122,8 +122,9 @@
                     <Button Style="{StaticResource PillButtonStyle}" Content="امروز" Margin="0,0,6,0"
                             Command="{Binding GoToTodayCommand}" ToolTip="بازگشت به امروز (Home)"
                             Visibility="{Binding IsAwayFromToday, Converter={StaticResource BoolToVisibility}}" />
-                    <Button Style="{StaticResource IconButtonStyle}" Content="&#xE76C;" Command="{Binding PreviousMonthCommand}" ToolTip="ماه قبل" />
-                    <Button Style="{StaticResource IconButtonStyle}" Content="&#xE76B;" Command="{Binding NextMonthCommand}" ToolTip="ماه بعد" />
+                    <!-- Right-to-left panel: › (next) sits right of ‹ (previous) -->
+                    <Button Style="{StaticResource IconButtonStyle}" Content="&#xE76C;" Command="{Binding NextMonthCommand}" ToolTip="ماه بعد" />
+                    <Button Style="{StaticResource IconButtonStyle}" Content="&#xE76B;" Command="{Binding PreviousMonthCommand}" ToolTip="ماه قبل" />
                     <Button x:Name="MoreButton" Style="{StaticResource IconButtonStyle}" Content="&#xE712;" Click="MoreButton_Click" ToolTip="تنظیمات" />
                 </StackPanel>
             </Grid>

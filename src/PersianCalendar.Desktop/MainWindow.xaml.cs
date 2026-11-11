@@ -137,8 +137,8 @@ public partial class MainWindow : Window
     {
         ICommand? command = e.Key switch
         {
-            Key.Right or Key.PageUp => _vm.PreviousMonthCommand, // RTL: right = backwards
-            Key.Left or Key.PageDown => _vm.NextMonthCommand,
+            Key.Left or Key.PageUp => _vm.PreviousMonthCommand, // ‹ previous
+            Key.Right or Key.PageDown => _vm.NextMonthCommand,  // › next
             Key.Up => _vm.PreviousYearCommand,
             Key.Down => _vm.NextYearCommand,
             Key.Home or Key.T => _vm.GoToTodayCommand,
@@ -215,7 +215,8 @@ public partial class MainWindow : Window
         var duration = TimeSpan.FromMilliseconds(320);
         var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
         DaysTranslate.BeginAnimation(TranslateTransform.XProperty,
-            new DoubleAnimation(36 * direction, 0, duration) { EasingFunction = ease });
+            // Next month slides in from the right (› side), previous from the left; X is mirrored in RTL.
+            new DoubleAnimation(-36 * direction, 0, duration) { EasingFunction = ease });
         DaysList.BeginAnimation(OpacityProperty, new DoubleAnimation(0.15, 1, duration) { EasingFunction = ease });
     }
 

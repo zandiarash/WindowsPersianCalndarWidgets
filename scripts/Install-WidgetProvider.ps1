@@ -42,10 +42,27 @@ $manifest = Get-ChildItem (Join-Path $root "src/PersianCalendar.WidgetProvider/b
 if (-not $manifest) { throw 'AppxManifest.xml was not generated.' }
 
 Get-Process PersianCalendar.WidgetProvider -ErrorAction SilentlyContinue | Stop-Process -Force
-robocopy $manifest.DirectoryName $deploy /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+
+# The shell keeps some package files (e.g. resources.pri) memory-mapped. Mapped files can't be
+# overwritten but can be renamed, so move the previous files aside before copying the new layout.
+if (Test-Path $deploy) {
+    Get-ChildItem $deploy -Recurse -File -Filter '*.stale' | Remove-Item -Force -ErrorAction SilentlyContinue
+    Get-ChildItem $deploy -Recurse -File | Where-Object Extension -ne '.stale' |
+        ForEach-Object { Rename-Item $_.FullName "$($_.Name).$([guid]::NewGuid().ToString('N')).stale" -ErrorAction SilentlyContinue }
+}
+robocopy $manifest.DirectoryName $deploy /E /R:2 /W:1 /XF *.stale /NFL /NDL /NJH /NJS /NP | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "Copying the package layout failed (robocopy $LASTEXITCODE)." }
 
-Write-Host "Registering $deploy" -ForegroundColor Cyan
+# Windows only re-registers a development package when its version grows, so stamp a
+# time-based version (1.0.<days since 2025>.<2-second slot of the day>) → in-place update, pins survive.
+$now = Get-Date
+$version = "1.0.$([int]($now.Date - [datetime]'2025-01-01').TotalDays).$([int]($now.TimeOfDay.TotalSeconds / 2))"
+$manifestPath = Join-Path $deploy 'AppxManifest.xml'
+[xml]$xml = Get-Content $manifestPath -Raw
+$xml.Package.Identity.Version = $version
+$xml.Save($manifestPath)
+
+Write-Host "Registering $deploy (v$version)" -ForegroundColor Cyan
 Add-AppxPackage -Register (Join-Path $deploy 'AppxManifest.xml') -ForceApplicationShutdown -ForceUpdateFromAnyVersion
 
 # Restart the Widgets host so the new provider shows up in the picker immediately.

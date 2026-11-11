@@ -1,19 +1,12 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using PersianCalendar.WidgetProvider;
-using Microsoft.Windows.Widgets;
 using PersianCalendar.WidgetProvider.Com;
 
-// `--preview <folder>` writes template + data JSON per size (paste into https://adaptivecards.io/designer).
+// `--preview <folder>` renders every card part, a Widgets Board mock-up per size/theme, and the data JSON.
 if (args is ["--preview", var folder])
 {
-    Directory.CreateDirectory(folder);
-    foreach (var size in (ReadOnlySpan<WidgetSize>)[WidgetSize.Small, WidgetSize.Medium, WidgetSize.Large])
-    {
-        var name = size.ToString().ToLowerInvariant();
-        File.WriteAllText(Path.Combine(folder, $"{name}.template.json"), CardTemplates.For(size));
-        File.WriteAllText(Path.Combine(folder, $"{name}.data.json"), CardData.Build(size, 0, TimeProvider.System));
-    }
+    CardData.WritePreview(folder, TimeProvider.System.GetLocalNow());
     return;
 }
 

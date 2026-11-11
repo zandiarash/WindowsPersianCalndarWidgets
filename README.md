@@ -5,12 +5,14 @@ A Persian (Solar Hijri / Jalali) calendar for Windows 11, built with **.NET 11**
 | | What it is | Where it lives |
 |---|---|---|
 | **Desktop widget** (`PersianCalendar.Desktop`) | A frameless WPF window with a live clock, the full month and occasions. It uses the native Windows 11 acrylic backdrop | On your desktop: pinned under other windows, always on top, or a normal window |
-| **Widgets Board provider** (`PersianCalendar.WidgetProvider`) | An official Windows 11 widget (Adaptive Cards) in small, medium and large sizes | `Win + W` → **+** → «تقویم شمسی» |
+| **Widgets Board provider** (`PersianCalendar.WidgetProvider`) | An official Windows 11 widget in small, medium and large sizes, drawn in the same style and Vazirmatn font as the desktop widget | `Win + W` → **+** → «تقویم شمسی» |
 
 <p align="center">
-  <img src="docs/desktop-dark.png" width="300" alt="Desktop widget — dark" />
+  <img src="docs/desktop-dark.png" width="260" alt="Desktop widget — dark" />
   &nbsp;
-  <img src="docs/desktop-light.png" width="300" alt="Desktop widget — light" />
+  <img src="docs/desktop-light.png" width="260" alt="Desktop widget — light" />
+  &nbsp;
+  <img src="docs/widget-board.png" width="260" alt="Widgets Board card (large)" />
 </p>
 
 ## Features
@@ -24,12 +26,13 @@ A Persian (Solar Hijri / Jalali) calendar for Windows 11, built with **.NET 11**
 - **Feels native on Windows 11**: acrylic backdrop, DWM rounded corners and shadow, light/dark that follows the system, Vazirmatn font, and Fluent icons.
 - **Tray icon** that always shows today's day number. Left-click shows or hides the widget; right-click opens the menu.
 - **Context menu** (right-click or the `⋯` button): pinned to desktop, always on top, or normal window; theme; show seconds; show Gregorian day numbers; start with Windows; hide; exit.
-- **Keyboard and mouse**: `→`/`←` or `PgUp`/`PgDn` change month, `↑`/`↓` change year, `Home`/`T` go to today, `Esc` hides the widget. Mouse wheel changes month; Ctrl+wheel changes year. Drag the hero card to move the widget; its position is remembered.
+- **Widgets Board sizes**: small is a date tile; medium adds the current week; large has the full month with ‹ (previous) / › (next) buttons, a «امروز» button when you browse away, and the next occasion. The Widgets host only offers its system font, so the provider draws the card parts with WPF and Vazirmatn and sends them as images. Each part comes in a dark and a light version, chosen with `$host.hostTheme`.
+- **Keyboard and mouse**: `←`/`→` (previous / next) or `PgUp`/`PgDn` change month, `↑`/`↓` change year, `Home`/`T` go to today, `Esc` hides the widget. Mouse wheel changes month; Ctrl+wheel changes year. Drag the hero card to move the widget; its position is remembered.
 
 ## Requirements
 
 - Windows 11 (22H2 or later recommended)
-- [.NET 11 SDK](https://dotnet.microsoft.com/download/dotnet/11.0). `global.json` pins `11.0.100-rc.3` with `rollForward: latestFeature`.
+- [.NET 11 SDK](https://dotnet.microsoft.com/download/dotnet/11.0). `global.json` pins `11.0.100` with `rollForward: latestFeature`.
 - For the Widgets Board provider:
   - **Developer Mode** (Settings → System → For developers)
   - **Windows App Runtime 2.6**. It is usually installed already; otherwise run `winget install Microsoft.WindowsAppRuntime.2.6`.
@@ -76,7 +79,7 @@ Directory.Build.props               ← shared settings: LangVersion=preview, nu
 Directory.Packages.props            ← Central Package Management
 global.json
 src/
-  PersianCalendar.Core/             ← UI-agnostic, AOT-compatible calendar engine
+  PersianCalendar.Core/             ← UI-agnostic calendar engine (+ shared season colours)
     JalaliDate.cs                   ← readonly record struct over DateOnly
     HijriDate.cs                    ← Umm al-Qura + Iran adjustment
     EventCatalog.cs                 ← holidays and occasions (FrozenDictionary)
@@ -90,11 +93,11 @@ src/
   PersianCalendar.WidgetProvider/   ← Windows 11 Widgets Board provider (MSIX + COM server)
     WidgetProvider.cs               ← IWidgetProvider implementation
     CardData.cs                     ← Adaptive Card data binding
+    Rendering/CardRenderer.cs       ← WPF + Vazirmatn drawing of the card parts (STA render thread)
     Templates/                      ← small / medium / large Adaptive Card templates
     Com/ClassFactory.cs             ← [GeneratedComInterface] class factory
 tests/PersianCalendar.Core.Tests/   ← MSTest 4
 tools/generate-assets.cs            ← file-based app: regenerates icons and images
-tools/expand-cards.cs               ← file-based app: checks Adaptive Card templates
 scripts/                            ← install / uninstall the widget provider
 ```
 
@@ -122,7 +125,7 @@ scripts/                            ← install / uninstall the widget provider
 - **Lunar date adjustment**: lunar dates use the Umm al-Qura calendar shifted by `HijriDate.IranAdjustment` (−1 day), which matches Iran's official calendar for the tested dates. You can override it per user with `HijriAdjustment` in `%LOCALAPPDATA%\PersianCalendarWidget\settings.json`. Lunar holidays may still differ by a day from the final official announcement.
 - **Season colours**: `ThemeService.SeasonColors` (desktop) and `tools/generate-assets.cs` (widget backgrounds).
 - **Screenshots and docs**: `PersianCalendarWidget.exe --snapshot out.png [--dark|--light]` renders the widget to a PNG.
-- **Inspecting the widget cards**: `PersianCalendar.WidgetProvider.exe --preview <folder>` writes the template and data for each size. Paste them into the [Adaptive Cards Designer](https://adaptivecards.io/designer).
+- **Inspecting the widget cards**: `PersianCalendar.WidgetProvider.exe --preview <folder>` renders every card part and a Widgets Board mock-up for each size and theme (`large-dark.png`, …), plus the data JSON. Picker screenshots in `Assets/Screenshot*.png` come from this.
 
 ## Credits
 

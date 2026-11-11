@@ -40,14 +40,9 @@ SavePng(Icon(50), Path.Combine(widgetAssets, "StoreLogo.png"));
 SavePng(Icon(256), Path.Combine(widgetAssets, "WidgetIcon.png"));
 SavePng(Banner(310, 150), Path.Combine(widgetAssets, "Wide310x150Logo.png"));
 SavePng(Banner(620, 300), Path.Combine(widgetAssets, "SplashScreen.png"));
-SavePng(Screenshot(300, 304, dark: true), Path.Combine(widgetAssets, "ScreenshotDark.png"));
-SavePng(Screenshot(300, 304, dark: false), Path.Combine(widgetAssets, "ScreenshotLight.png"));
-
-// ---------- Seasonal hero backgrounds for the Adaptive Card ----------
-var heroDir = Path.Combine(root, "src", "PersianCalendar.WidgetProvider", "Templates");
-string[] names = ["spring", "summer", "autumn", "winter"];
-for (var i = 0; i < 4; i++)
-    SavePng(Hero(480, 220, seasons[i].A, seasons[i].B), Path.Combine(heroDir, $"hero-{names[i]}.png"));
+// Widget-picker screenshots (Assets/Screenshot*.png) come from the real card renderer:
+//   PersianCalendar.WidgetProvider.exe --preview <folder>   → large-dark.png / large-light.png
+_ = seasons;
 
 Console.WriteLine("Assets generated under " + root);
 
@@ -100,70 +95,6 @@ Bitmap Banner(int w, int h)
     Hq(g);
     using var icon = Icon((int)(h * 0.62f));
     g.DrawImage(icon, (w - icon.Width) / 2f, (h - icon.Height) / 2f);
-    return bmp;
-}
-
-Bitmap Hero(int w, int h, Color a, Color b)
-{
-    var bmp = new Bitmap(w, h, PixelFormat.Format32bppArgb);
-    using var g = Graphics.FromImage(bmp);
-    Hq(g);
-    using (var bg = new LinearGradientBrush(new Rectangle(0, 0, w, h), a, b, 25f))
-        g.FillRectangle(bg, 0, 0, w, h);
-    using var c1 = new SolidBrush(Color.FromArgb(34, 255, 255, 255));
-    using var c2 = new SolidBrush(Color.FromArgb(22, 255, 255, 255));
-    g.FillEllipse(c1, -h * 0.45f, -h * 0.55f, h * 1.1f, h * 1.1f);
-    g.FillEllipse(c2, w * 0.18f, h * 0.55f, h * 0.8f, h * 0.8f);
-    g.FillEllipse(c2, w * 0.82f, -h * 0.25f, h * 0.55f, h * 0.55f);
-    return bmp;
-}
-
-Bitmap Screenshot(int w, int h, bool dark)
-{
-    var bmp = new Bitmap(w, h, PixelFormat.Format32bppArgb);
-    using var g = Graphics.FromImage(bmp);
-    Hq(g);
-    g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-    g.Clear(dark ? Color.FromArgb(0x20, 0x20, 0x26) : Color.FromArgb(0xF7, 0xF7, 0xFA));
-    using (var hero = Hero(w, 120, seasons[2].A, seasons[2].B))
-    using (var path = Rounded(new RectangleF(8, 8, w - 16, 112), 14))
-    {
-        g.SetClip(path);
-        g.DrawImage(hero, 8, 8, w - 16, 112);
-        g.ResetClip();
-    }
-    using var white = new SolidBrush(Color.White);
-    using var big = new Font(vazir, 52, FontStyle.Bold, GraphicsUnit.Pixel);
-    using var mid = new Font(vazir, 17, FontStyle.Bold, GraphicsUnit.Pixel);
-    using var small = new Font(vazir, 12, FontStyle.Regular, GraphicsUnit.Pixel);
-    var rtl = new StringFormat(StringFormatFlags.DirectionRightToLeft);
-    g.DrawString("۲۰", big, white, w - 24, 16, rtl);
-    g.DrawString("آبان ۱۴۰۵", mid, white, w - 100, 34, rtl);
-    g.DrawString("چهارشنبه", small, white, w - 100, 60, rtl);
-    g.DrawString("۱۶:۵۲", mid, white, 22, 30);
-
-    using var text = new SolidBrush(dark ? Color.FromArgb(235, 235, 245) : Color.FromArgb(30, 30, 40));
-    using var holiday = new SolidBrush(Color.FromArgb(0xEF, 0x44, 0x44));
-    using var accent = new SolidBrush(seasons[2].A);
-    string[] wd = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
-    var cw = (w - 24) / 7f;
-    var sfc = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-    for (var i = 0; i < 7; i++)
-        g.DrawString(wd[i], small, i == 6 ? holiday : text, new RectangleF(w - 12 - (i + 1) * cw, 128, cw, 20), sfc);
-    // Aban 1405 starts on Friday (index 6)
-    for (var d = 1; d <= 30; d++)
-    {
-        var idx = 6 + d - 1;
-        var (row, col) = (idx / 7, idx % 7);
-        var cell = new RectangleF(w - 12 - (col + 1) * cw, 150 + row * 25, cw, 24);
-        if (d == 20)
-        {
-            using var p = Rounded(new RectangleF(cell.X + 4, cell.Y + 1, cell.Width - 8, cell.Height - 2), 8);
-            g.FillPath(accent, p);
-        }
-        g.DrawString(d.ToString().Aggregate("", (s, c) => s + (char)('۰' + c - '0')), small,
-            d == 20 ? white : col == 6 ? holiday : text, cell, sfc);
-    }
     return bmp;
 }
 

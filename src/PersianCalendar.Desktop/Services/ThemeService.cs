@@ -12,12 +12,11 @@ namespace PersianCalendar.Desktop.Services;
 public sealed class ThemeService
 {
     private static readonly (Color From, Color To)[] SeasonColors =
-    [
-        (Color.FromRgb(0x10, 0xB9, 0x81), Color.FromRgb(0x06, 0x8F, 0xC7)), // بهار
-        (Color.FromRgb(0xF5, 0x9E, 0x0B), Color.FromRgb(0xE1, 0x1D, 0x48)), // تابستان
-        (Color.FromRgb(0xF9, 0x73, 0x16), Color.FromRgb(0xBE, 0x18, 0x5D)), // پاییز
-        (Color.FromRgb(0x63, 0x66, 0xF1), Color.FromRgb(0x0E, 0x74, 0xC9)), // زمستان
-    ];
+    [.. Enum.GetValues<Season>().Select(static s =>
+    {
+        var (from, to) = SeasonPalette.Hex(s);
+        return ((Color)ColorConverter.ConvertFromString(from), (Color)ColorConverter.ConvertFromString(to));
+    })];
 
     private AppTheme _theme;
 
