@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap3 com rescap">
+
+  <Identity Name="PersianCalendar.WidgetProvider" Publisher="CN=PersianCalendarWidget" Version="1.0.0.0" />
+
+  <Properties>
+    <DisplayName>تقویم شمسی</DisplayName>
+    <PublisherDisplayName>Persian Calendar Widget</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements DisplayName="تقویم شمسی" Description="ویجت تقویم شمسی برای ویندوز ۱۱"
+                          BackgroundColor="transparent" AppListEntry="none"
+                          Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- Out-of-process COM server the Widgets host activates -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer Executable="PersianCalendar.WidgetProvider.exe" Arguments="-RegisterProcessAsComServer" DisplayName="Persian Calendar Widget Provider">
+              <com:Class Id="2F6C8ED1-5E7A-4EF8-8DC4-763D4888664D" DisplayName="Persian Calendar Widget Provider" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <!-- Widget registration -->
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension Name="com.microsoft.windows.widgets" DisplayName="تقویم شمسی" Id="PersianCalendarWidgets" PublicFolder="Public">
+            <uap3:Properties>
+              <WidgetProvider>
+                <ProviderIcons>
+                  <Icon Path="Assets\WidgetIcon.png" />
+                </ProviderIcons>
+                <Activation>
+                  <CreateInstance ClassId="2F6C8ED1-5E7A-4EF8-8DC4-763D4888664D" />
+                </Activation>
+                <Definitions>
+                  <Definition Id="PersianCalendar"
+                              DisplayName="تقویم شمسی"
+                              Description="تاریخ و ساعت، روزهای هفته و تقویم ماه شمسی همراه با مناسبت‌ها"
+                              AllowMultiple="true"
+                              IsCustomizable="false">
+                    <Capabilities>
+                      <Capability><Size Name="small" /></Capability>
+                      <Capability><Size Name="medium" /></Capability>
+                      <Capability><Size Name="large" /></Capability>
+                    </Capabilities>
+                    <ThemeResources>
+                      <Icons>
+                        <Icon Path="Assets\WidgetIcon.png" />
+                      </Icons>
+                      <Screenshots>
+                        <Screenshot Path="Assets\ScreenshotDark.png" DisplayAltText="تقویم شمسی" />
+                      </Screenshots>
+                      <DarkMode>
+                        <Screenshots>
+                          <Screenshot Path="Assets\ScreenshotDark.png" DisplayAltText="تقویم شمسی" />
+                        </Screenshots>
+                      </DarkMode>
+                      <LightMode>
+                        <Screenshots>
+                          <Screenshot Path="Assets\ScreenshotLight.png" DisplayAltText="تقویم شمسی" />
+                        </Screenshots>
+                      </LightMode>
+                    </ThemeResources>
+                  </Definition>
+                </Definitions>
+              </WidgetProvider>
+            </uap3:Properties>
+          </uap3:AppExtension>
+        </uap3:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

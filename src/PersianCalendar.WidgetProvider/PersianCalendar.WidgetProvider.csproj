@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Windows 11 Widgets Board provider (Adaptive Cards).
+    A packaged (MSIX) out-of-process COM server, activated on demand by the Widgets host.
+    Deploy with scripts/Install-WidgetProvider.ps1 (or F5 in Visual Studio).
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net11.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22621.0</TargetPlatformMinVersion>
+    <RootNamespace>PersianCalendar.WidgetProvider</RootNamespace>
+    <Platforms>x64;ARM64</Platforms>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <PackageArch Condition="'$(Platform)' == 'ARM64'">arm64</PackageArch>
+    <PackageArch Condition="'$(PackageArch)' == ''">x64</PackageArch>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-$(PackageArch)</RuntimeIdentifier>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Single-project MSIX packaging -->
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
+    <AppxBundle>Never</AppxBundle>
+    <!-- Widgets don't need the Main/Singleton runtime packages; skip the DeploymentManager auto-initializer -->
+    <WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\**" />
+    <Content Include="Public\**" />
+    <EmbeddedResource Include="Templates\*.json" LogicalName="Templates.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Templates\*.png" LogicalName="Templates.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PersianCalendar.Core\PersianCalendar.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Lets Visual Studio deploy/debug the package with F5 -->
+  <ItemGroup Condition="'$(EnableMsixTooling)' == 'true'">
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+
+</Project>

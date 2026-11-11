@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>PersianCalendar.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PersianCalendar.Core.Tests" />
+  </ItemGroup>
+
+</Project>

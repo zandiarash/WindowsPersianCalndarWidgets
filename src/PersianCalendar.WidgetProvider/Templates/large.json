@@ -1,0 +1,115 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "rtl": true,
+  "body": [
+    {
+      "type": "Container",
+      "style": "accent",
+      "bleed": true,
+      "height": "stretch",
+      "verticalContentAlignment": "center",
+      "backgroundImage": { "url": "${hero}", "fillMode": "cover", "horizontalAlignment": "center", "verticalAlignment": "center" },
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column", "width": "auto", "verticalContentAlignment": "center",
+              "items": [ { "type": "TextBlock", "text": "${day}", "size": "extraLarge", "weight": "bolder", "color": "light" } ]
+            },
+            {
+              "type": "Column", "width": "stretch", "verticalContentAlignment": "center",
+              "items": [
+                { "type": "TextBlock", "text": "${weekday}", "size": "medium", "weight": "bolder", "color": "light" },
+                { "type": "TextBlock", "text": "${monthYear}", "color": "light", "spacing": "none" }
+              ]
+            },
+            {
+              "type": "Column", "width": "auto", "verticalContentAlignment": "center",
+              "items": [
+                { "type": "TextBlock", "text": "${time}", "size": "large", "weight": "bolder", "color": "light", "horizontalAlignment": "left" },
+                { "type": "TextBlock", "text": "${greeting}", "size": "small", "color": "light", "isSubtle": true, "spacing": "none", "horizontalAlignment": "left" }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet", "spacing": "small",
+          "columns": [
+            { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "${hijri}", "size": "small", "color": "light" } ] },
+            { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "${gregorian}", "size": "small", "color": "light" } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "spacing": "medium",
+      "columns": [
+        {
+          "type": "Column", "width": "stretch", "verticalContentAlignment": "center",
+          "items": [
+            { "type": "TextBlock", "text": "${title}", "size": "medium", "weight": "bolder" },
+            { "type": "TextBlock", "text": "${subtitle}", "size": "small", "isSubtle": true, "spacing": "none" }
+          ]
+        },
+        {
+          "type": "Column", "width": "auto", "verticalContentAlignment": "center", "$when": "${isAway}",
+          "selectAction": { "type": "Action.Execute", "verb": "today", "tooltip": "امروز" },
+          "items": [ { "type": "TextBlock", "text": "امروز", "weight": "bolder", "color": "accent" } ]
+        },
+        {
+          "type": "Column", "width": "auto", "verticalContentAlignment": "center", "spacing": "medium",
+          "selectAction": { "type": "Action.Execute", "verb": "prev", "tooltip": "ماه قبل" },
+          "items": [ { "type": "TextBlock", "text": "  ›  ", "size": "large", "weight": "bolder" } ]
+        },
+        {
+          "type": "Column", "width": "auto", "verticalContentAlignment": "center", "spacing": "small",
+          "selectAction": { "type": "Action.Execute", "verb": "next", "tooltip": "ماه بعد" },
+          "items": [ { "type": "TextBlock", "text": "  ‹  ", "size": "large", "weight": "bolder" } ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "spacing": "small",
+      "columns": [
+        {
+          "$data": "${headers}",
+          "type": "Column", "width": "stretch",
+          "items": [ { "type": "TextBlock", "text": "${t}", "size": "small", "weight": "bolder", "isSubtle": true, "horizontalAlignment": "center", "color": "${color}" } ]
+        }
+      ]
+    },
+    {
+      "$data": "${weeks}",
+      "type": "ColumnSet",
+      "spacing": "none",
+      "columns": [
+        {
+          "$data": "${days}",
+          "type": "Column", "width": "stretch", "style": "${style}", "verticalContentAlignment": "center",
+          "items": [ { "type": "TextBlock", "text": "${n}", "horizontalAlignment": "center", "color": "${color}", "isSubtle": "${subtle}", "weight": "${weight}" } ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "$when": "${exists(nextEvent)}",
+      "separator": true,
+      "spacing": "medium",
+      "columns": [
+        {
+          "type": "Column", "width": "stretch",
+          "items": [ { "type": "TextBlock", "text": "پیش رو: **${nextEvent}**", "size": "small" } ]
+        },
+        {
+          "type": "Column", "width": "auto",
+          "items": [ { "type": "TextBlock", "text": "${nextWhen}", "size": "small", "color": "${nextColor}" } ]
+        }
+      ]
+    }
+  ]
+}
