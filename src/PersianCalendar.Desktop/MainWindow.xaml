@@ -22,11 +22,16 @@
                       CornerRadius="0" UseAeroCaptionButtons="False" />
     </WindowChrome.WindowChrome>
 
-    <Border x:Name="Root" Background="{DynamicResource WindowTintBrush}" Padding="12" Opacity="0">
-        <StackPanel>
+    <Border x:Name="Root" Background="{DynamicResource GlassTintBrush}" Opacity="0">
+      <Grid>
+        <!-- Glass sheen: soft diagonal light + bright top edge, like a pane of glass catching light -->
+        <Border x:Name="Sheen" IsHitTestVisible="False" Background="{DynamicResource GlassSheenBrush}"
+                BorderBrush="{DynamicResource GlassEdgeBrush}" BorderThickness="1" CornerRadius="8" />
+        <StackPanel Margin="12">
 
             <!-- ================= HERO: today ================= -->
             <Border x:Name="Hero" CornerRadius="18" Background="{DynamicResource HeroBrush}" ClipToBounds="True"
+                    BorderBrush="{DynamicResource GlassEdgeBrush}" BorderThickness="1"
                     MouseLeftButtonDown="DragArea_MouseLeftButtonDown" Cursor="SizeAll"
                     ToolTip="برای جابه‌جایی بکشید · راست‌کلیک برای تنظیمات">
                 <Grid>
@@ -260,5 +265,6 @@
                 </StackPanel>
             </Border>
         </StackPanel>
+      </Grid>
     </Border>
 </Window>

@@ -63,10 +63,17 @@ public partial class App : Application
 
         _window.Show();
 
-        // `PersianCalendarWidget.exe --snapshot out.png [--dark|--light]` renders a PNG and exits.
+        // `PersianCalendarWidget.exe --snapshot out.png [--dark|--light] [--glass|--normal]` renders a PNG and exits
+        // (the flags only affect the snapshot; saved settings are left alone).
         if (e.Args is ["--snapshot", var path, .. var rest])
         {
-            if (rest is [var mode, ..]) _theme.Apply(mode == "--light" ? AppTheme.Light : AppTheme.Dark);
+            if (rest.Contains("--light")) _theme.Apply(AppTheme.Light);
+            else if (rest.Contains("--dark")) _theme.Apply(AppTheme.Dark);
+            if (rest.Contains("--normal") || rest.Contains("--glass"))
+            {
+                settings.Glass = rest.Contains("--glass");
+                _window.ApplyBackdrop();
+            }
             _window.Dispatcher.BeginInvoke(() =>
             {
                 _window.SaveSnapshot(path);
@@ -97,6 +104,13 @@ public partial class App : Application
     {
         _settings.Current.Theme = theme;
         _theme.Apply(theme);
+        SaveSettings();
+    }
+
+    public void SetGlass(bool glass)
+    {
+        _settings.Current.Glass = glass;
+        _window?.ApplyBackdrop();
         SaveSettings();
     }
 

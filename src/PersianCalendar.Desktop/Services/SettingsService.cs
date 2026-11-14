@@ -15,6 +15,8 @@ public sealed class WidgetSettings
     public WindowLayer Layer { get; set; } = WindowLayer.Desktop;
     public AppTheme Theme { get; set; } = AppTheme.System;
     public bool ShowSeconds { get; set; } = true;
+    /// <summary>See-through blurred glass (true) or the denser Windows 11 acrylic look (false).</summary>
+    public bool Glass { get; set; } = true;
     public bool ShowGregorianNumbers { get; set; } = true;
     public int HijriAdjustment { get; set; } = Core.HijriDate.IranAdjustment;
 }

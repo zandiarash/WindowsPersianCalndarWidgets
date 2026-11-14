@@ -28,7 +28,7 @@ public partial class MainWindow : Window
         _settings = settings;
         _theme = theme;
 
-        ThemeService.ApplyHeroSeason(vm.TodaySeason);
+        ThemeService.ApplyHeroSeason(vm.TodaySeason, translucent: settings.Glass);
         ThemeService.ApplyAccentSeason(vm.DisplayedSeason);
 
         vm.MonthChanged += AnimateMonth;
@@ -60,13 +60,33 @@ public partial class MainWindow : Window
         ApplyLayer();
     }
 
-    /// <summary>Windows 11 acrylic backdrop + rounded corners drawn by DWM (native shadow included).</summary>
-    private void ApplyBackdrop()
+    /// <summary>
+    /// Glass: live blur of the desktop behind the widget + a light tint, sheen and translucent header.
+    /// Normal: a solid, opaque background and header.
+    /// Both get DWM rounded corners and the native shadow.
+    /// </summary>
+    public void ApplyBackdrop()
     {
+        var glass = _settings.Glass;
+        Root.SetResourceReference(System.Windows.Controls.Border.BackgroundProperty, glass ? "GlassTintBrush" : "SolidBackgroundBrush");
+        Sheen.Visibility = glass ? Visibility.Visible : Visibility.Collapsed;
+        Hero.BorderThickness = new Thickness(glass ? 1 : 0); // glass edge only in glass mode
+
+        // Normal mode: opaque cards instead of the see-through glass ones (local override of the theme keys).
+        Root.Resources.Remove("SurfaceBrush");
+        Root.Resources.Remove("SurfaceStrokeBrush");
+        if (!glass)
+        {
+            Root.Resources["SurfaceBrush"] = FindResource("SolidSurfaceBrush");
+            Root.Resources["SurfaceStrokeBrush"] = FindResource("SolidSurfaceStrokeBrush");
+        }
+        ThemeService.ApplyHeroSeason(_vm.TodaySeason, translucent: glass);
         if (_hwnd == 0) return;
+
         SetDwm(_hwnd, DwmWindowAttribute.UseImmersiveDarkMode, _theme.IsDark ? 1 : 0);
         SetDwm(_hwnd, DwmWindowAttribute.WindowCornerPreference, (int)DwmCorner.Round);
-        SetDwm(_hwnd, DwmWindowAttribute.SystemBackdropType, (int)DwmBackdrop.Acrylic);
+        SetDwm(_hwnd, DwmWindowAttribute.SystemBackdropType, (int)DwmBackdrop.None);
+        SetBlurBehind(_hwnd, glass);
         _ = DwmExtendFrameIntoClientArea(_hwnd, new Margins(-1));
     }
 
@@ -180,6 +200,9 @@ public partial class MainWindow : Window
         menu.Items.Add(Item("پوستهٔ روشن", "", _settings.Theme == AppTheme.Light, () => app.SetTheme(AppTheme.Light)));
         menu.Items.Add(Item("پوستهٔ تیره", "", _settings.Theme == AppTheme.Dark, () => app.SetTheme(AppTheme.Dark)));
         menu.Items.Add(new Separator());
+        menu.Items.Add(Item("پس‌زمینهٔ شیشه‌ای", "", _settings.Glass, () => app.SetGlass(true)));
+        menu.Items.Add(Item("پس‌زمینهٔ معمولی", "", !_settings.Glass, () => app.SetGlass(false)));
+        menu.Items.Add(new Separator());
         menu.Items.Add(Item("نمایش ثانیه", "", _settings.ShowSeconds, app.ToggleSeconds));
         menu.Items.Add(Item("نمایش روز میلادی در جدول", "", _settings.ShowGregorianNumbers, app.ToggleGregorianNumbers));
         menu.Items.Add(Item("اجرا همراه با ویندوز", "", StartupService.IsEnabled, app.ToggleStartup));
@@ -205,7 +228,7 @@ public partial class MainWindow : Window
                 ThemeService.ApplyAccentSeason(_vm.DisplayedSeason);
                 break;
             case nameof(MainViewModel.TodaySeason):
-                ThemeService.ApplyHeroSeason(_vm.TodaySeason);
+                ThemeService.ApplyHeroSeason(_vm.TodaySeason, translucent: _settings.Glass);
                 break;
         }
     }
@@ -240,8 +263,15 @@ public partial class MainWindow : Window
         var visual = new DrawingVisual();
         using (var dc = visual.RenderOpen())
         {
-            var backdrop = _theme.IsDark ? Color.FromRgb(0x24, 0x22, 0x36) : Color.FromRgb(0xE9, 0xEC, 0xF5);
-            dc.DrawRoundedRectangle(new SolidColorBrush(backdrop), null, new Rect(0, 0, w, h), 8, 8);
+            // Stand-in for the blurred desktop: a soft wallpaper-like gradient (glass) or a flat acrylic fill.
+            Brush backdrop = _settings.Glass
+                ? new LinearGradientBrush(new GradientStopCollection
+                  {
+                      new(Color.FromRgb(0x1E, 0x3A, 0x8A), 0), new(Color.FromRgb(0x7C, 0x3A, 0xED), 0.45),
+                      new(Color.FromRgb(0xF9, 0x73, 0x16), 1),
+                  }, new Point(0, 0), new Point(1, 1))
+                : new SolidColorBrush(_theme.IsDark ? Color.FromRgb(0x24, 0x22, 0x36) : Color.FromRgb(0xE9, 0xEC, 0xF5));
+            dc.DrawRoundedRectangle(backdrop, null, new Rect(0, 0, w, h), 8, 8);
             // A VisualBrush of a right-to-left element is captured mirrored; flip it back.
             dc.PushTransform(new MatrixTransform(-1, 0, 0, 1, w, 0));
             dc.DrawRectangle(new VisualBrush(Root), null, new Rect(0, 0, w, h));

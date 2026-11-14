@@ -47,6 +47,38 @@ internal static partial class NativeMethods
         public uint flags;
     }
 
+    // ---- Blur-behind ("glass") via the window composition accent policy ----
+    public enum AccentState { Disabled = 0, BlurBehind = 3, AcrylicBlurBehind = 4 }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct AccentPolicy
+    {
+        public AccentState AccentState;
+        public int AccentFlags;
+        public uint GradientColor; // ABGR, used by acrylic only
+        public int AnimationId;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WindowCompositionAttributeData
+    {
+        public int Attribute; // WCA_ACCENT_POLICY = 19
+        public nint Data;
+        public int SizeOfData;
+    }
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SetWindowCompositionAttribute(nint hwnd, ref WindowCompositionAttributeData data);
+
+    /// <summary>Blurs whatever is behind the window; unlike DWM backdrops it stays on when the window is inactive.</summary>
+    public static unsafe void SetBlurBehind(nint hwnd, bool enabled)
+    {
+        var accent = new AccentPolicy { AccentState = enabled ? AccentState.BlurBehind : AccentState.Disabled };
+        var data = new WindowCompositionAttributeData { Attribute = 19, Data = (nint)(&accent), SizeOfData = sizeof(AccentPolicy) };
+        SetWindowCompositionAttribute(hwnd, ref data);
+    }
+
     [LibraryImport("dwmapi.dll")]
     public static partial int DwmSetWindowAttribute(nint hwnd, DwmWindowAttribute attribute, in int value, int size);
 

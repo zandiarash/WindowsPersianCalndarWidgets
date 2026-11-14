@@ -50,10 +50,12 @@ public sealed class ThemeService
     }
 
     /// <summary>Hero gradient follows today's season.</summary>
-    public static void ApplyHeroSeason(Season season)
+    /// <param name="translucent">Glass mode: let the blurred desktop glow through the coloured header.</param>
+    public static void ApplyHeroSeason(Season season, bool translucent)
     {
         var (from, to) = SeasonColors[(int)season];
-        Application.Current.Resources["HeroBrush"] = Gradient(from, to);
+        byte alpha = translucent ? (byte)0xD0 : (byte)0xFF;
+        Application.Current.Resources["HeroBrush"] = Gradient(WithAlpha(from, alpha), WithAlpha(to, alpha));
     }
 
     /// <summary>Accent colours follow the season of the month on screen.</summary>
@@ -66,6 +68,8 @@ public sealed class ThemeService
         res["AccentSoftBrush"] = Freeze(new SolidColorBrush(Color.FromArgb(0x2E, from.R, from.G, from.B)));
         res["AccentGlowColor"] = from;
     }
+
+    private static Color WithAlpha(Color c, byte alpha) => Color.FromArgb(alpha, c.R, c.G, c.B);
 
     public static Color SeasonColor(Season season) => SeasonColors[(int)season].From;
 
