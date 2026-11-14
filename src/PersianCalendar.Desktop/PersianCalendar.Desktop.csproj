@@ -9,6 +9,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- WPF reads per-monitor DPI awareness from app.manifest; the WinForms analyzer (tray icon only) doesn't apply -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
     <AssemblyName>PersianCalendarWidget</AssemblyName>
     <RootNamespace>PersianCalendar.Desktop</RootNamespace>
     <InvariantGlobalization>false</InvariantGlobalization>

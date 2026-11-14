@@ -55,22 +55,39 @@ dotnet run --project src/PersianCalendar.Desktop
 
 In **Visual Studio 2026**, open `PersianCalendarWidget.slnx`. Set `PersianCalendar.WidgetProvider` as the startup project and press F5 to deploy and debug the widget.
 
-### Publishing the desktop widget
+## Versioning
 
-```powershell
-dotnet publish src/PersianCalendar.Desktop -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
-# → src/PersianCalendar.Desktop/bin/Release/net11.0-windows/win-x64/publish/PersianCalendarWidget.exe
+The software version is set in **one place**, `AppVersion` in [`Directory.Build.props`](Directory.Build.props):
+
+```xml
+<AppVersion>1.0.0.0</AppVersion>   <!-- Major.Minor.Build.Revision, each part 0–65535 -->
 ```
 
-### Building a signed MSIX for the widget provider
+The following all come from it, so nothing else needs editing:
+
+- `ApplicationVersion`, `AssemblyVersion`, `FileVersion` and `Version` for every project
+- the exe's file properties
+- the version shown at the bottom of the desktop widget's menu
+- the MSIX `Identity Version` in `Package.appxmanifest`, which is updated automatically at build time
+
+## Publishing a release
 
 ```powershell
-dotnet publish src/PersianCalendar.WidgetProvider -c Release -p:Platform=x64 `
-  -p:GenerateAppxPackageOnBuild=true -p:AppxPackageSigningEnabled=true `
-  -p:PackageCertificateKeyFile=path\to\cert.pfx -p:PackageCertificatePassword=***
+./scripts/Publish.ps1                      # self-contained (no .NET install needed)
+./scripts/Publish.ps1 -FrameworkDependent  # small exe; users need the .NET 11 Desktop Runtime
+./scripts/Publish.ps1 -CertificatePath my.pfx -CertificatePassword (Read-Host -AsSecureString)
 ```
 
-The certificate subject must match `Publisher` in `Package.appxmanifest` (`CN=PersianCalendarWidget`).
+Output in `artifacts/<version>/`:
+
+| File | For users |
+|---|---|
+| `PersianCalendarWidget-<version>-win-x64.zip` | Desktop widget. Unzip and run `PersianCalendarWidget.exe`. It's one self-contained file; the first start unpacks it to `%TEMP%\.net`. |
+| `PersianCalendarWidget-WidgetsBoard-<version>-x64.zip` | Windows 11 Widgets Board widget. Unzip, then run `Install.ps1` as administrator. It trusts the signing certificate and installs the signed `.msix`. |
+
+The MSIX must be signed with a certificate whose subject matches `Publisher` in `Package.appxmanifest` (`CN=PersianCalendarWidget`). Without `-CertificatePath`, the script creates a self-signed one once in `Cert:\CurrentUser\My` and reuses it. That's fine for sharing directly with people. For the Microsoft Store or wide distribution, use a certificate from a trusted CA, or let the Store sign the package.
+
+> Development installs (`Install-WidgetProvider.ps1`) stamp a time-based package version so they can update in place. Before installing a published MSIX on the same machine, remove the development install with `./scripts/Uninstall-WidgetProvider.ps1`. Otherwise Windows treats the published package as a downgrade.
 
 ## Solution layout
 

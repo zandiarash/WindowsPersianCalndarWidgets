@@ -1,4 +1,25 @@
 <Project>
+  <!-- ================================================================
+       SOFTWARE VERSION: change it here only (Major.Minor.Build.Revision).
+       Every project, the exe file properties and the widget's MSIX
+       package manifest take their version from this value.
+       Each part must be 0–65535 (MSIX / Win32 file-version limits).
+       ================================================================ -->
+  <PropertyGroup>
+    <AppVersion>1.0.0.0</AppVersion>
+  </PropertyGroup>
+
+  <!-- Derived version properties (do not edit) -->
+  <PropertyGroup>
+    <ApplicationVersion>$(AppVersion)</ApplicationVersion>
+    <AssemblyVersion>$(AppVersion)</AssemblyVersion>
+    <FileVersion>$(AppVersion)</FileVersion>
+    <Version>$(AppVersion)</Version>
+    <InformationalVersion>$(AppVersion)</InformationalVersion>
+    <!-- Keep "+<commit hash>" out of the displayed product version -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
   <!-- Shared settings for every project in the solution -->
   <PropertyGroup>
     <LangVersion>preview</LangVersion>
@@ -9,7 +30,7 @@
     <Deterministic>true</Deterministic>
     <Product>Persian Calendar Widget</Product>
     <Company>Persian Calendar Widget</Company>
-    <Version>1.0.0</Version>
+    <Copyright>© $([System.DateTime]::Now.Year) Persian Calendar Widget</Copyright>
     <NeutralLanguage>fa-IR</NeutralLanguage>
   </PropertyGroup>
 </Project>

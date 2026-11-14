@@ -209,6 +209,16 @@ public partial class MainWindow : Window
         menu.Items.Add(new Separator());
         menu.Items.Add(Item("پنهان کردن", "", false, Hide));
         menu.Items.Add(Item("خروج", "", false, app.ExitApp));
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
+            Header = $"نسخهٔ {App.Version}",
+            Icon = new TextBlock { Text = "" },
+            IsHitTestVisible = false,
+            Focusable = false,
+            Opacity = 0.55,
+            FlowDirection = FlowDirection.RightToLeft,
+        });
 
         static MenuItem Item(string header, string glyph, bool isChecked, Action action)
         {

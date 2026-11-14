@@ -45,6 +45,21 @@
     <ProjectReference Include="..\PersianCalendar.Core\PersianCalendar.Core.csproj" />
   </ItemGroup>
 
+  <!-- Keep the MSIX package version in sync with $(AppVersion) from Directory.Build.props.
+       The manifest is only rewritten when the version actually differs. -->
+  <PropertyGroup>
+    <_AppxNs>&lt;Namespace Prefix='m' Uri='http://schemas.microsoft.com/appx/manifest/foundation/windows10' /&gt;</_AppxNs>
+  </PropertyGroup>
+  <Target Name="SyncPackageManifestVersion" BeforeTargets="BeforeBuild">
+    <XmlPeek XmlInputPath="Package.appxmanifest" Query="/m:Package/m:Identity/@Version" Namespaces="$(_AppxNs)">
+      <Output TaskParameter="Result" PropertyName="_ManifestVersion" />
+    </XmlPeek>
+    <XmlPoke Condition="'$(_ManifestVersion)' != '$(AppVersion)'" XmlInputPath="Package.appxmanifest"
+             Query="/m:Package/m:Identity/@Version" Value="$(AppVersion)" Namespaces="$(_AppxNs)" />
+    <Message Condition="'$(_ManifestVersion)' != '$(AppVersion)'" Importance="high"
+             Text="Package.appxmanifest version: $(_ManifestVersion) → $(AppVersion)" />
+  </Target>
+
   <!-- Lets Visual Studio deploy/debug the package with F5 -->
   <ItemGroup Condition="'$(EnableMsixTooling)' == 'true'">
     <ProjectCapability Include="Msix" />

@@ -21,6 +21,12 @@ public partial class App : Application
 
     public static new App Current => (App)Application.Current;
 
+    /// <summary>Four-part software version (AppVersion in Directory.Build.props), in Persian digits.</summary>
+    public static string Version { get; } =
+        (System.Reflection.CustomAttributeExtensions
+            .GetCustomAttribute<System.Reflection.AssemblyFileVersionAttribute>(typeof(App).Assembly)?.Version ?? "0.0.0.0")
+        .ToPersianDigits();
+
     public bool IsExiting { get; private set; }
 
     protected override void OnStartup(StartupEventArgs e)
