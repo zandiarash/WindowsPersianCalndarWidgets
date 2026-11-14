@@ -77,12 +77,14 @@ internal static class CardRenderer
     //  Hero: today's date + clock on the seasonal gradient (theme independent)
     // =====================================================================
 
-    public static CardImage Hero(JalaliDate today, DateTimeOffset now, bool compact, EventCatalog catalog)
+    /// <param name="height">Override for the compact banner height (the small widget uses a shorter one).</param>
+    public static CardImage Hero(JalaliDate today, DateTimeOffset now, bool compact, EventCatalog catalog, double? height = null)
     {
-        double w = CardWidth, h = compact ? 116 : 144;
+        double w = CardWidth, h = height ?? (compact ? 116 : 144);
         var card = GradientCard(today.Season, w, h, 16);
 
-        var content = new Grid { Margin = new Thickness(16, 12, 16, 12), FlowDirection = FlowDirection.RightToLeft };
+        var vPad = h < 110 ? 8 : 12;
+        var content = new Grid { Margin = new Thickness(16, vPad, 16, vPad), FlowDirection = FlowDirection.RightToLeft };
         content.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         content.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition());
@@ -145,7 +147,11 @@ internal static class CardRenderer
         return Render(card, w, h);
     }
 
-    /// <summary>Square tile for the small widget.</summary>
+    /// <summary>Full-width banner for the small widget (the board's small card is wide and short).</summary>
+    public static CardImage SmallBanner(JalaliDate today, DateTimeOffset now, EventCatalog catalog) =>
+        Hero(today, now, compact: true, catalog, height: 104);
+
+    /// <summary>Square tile (kept for a possible narrow host layout).</summary>
     public static CardImage Tile(JalaliDate today, DateTimeOffset now)
     {
         const double size = 128;

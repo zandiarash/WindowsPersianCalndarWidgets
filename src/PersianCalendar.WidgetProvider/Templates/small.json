@@ -5,6 +5,6 @@
   "rtl": true,
   "verticalContentAlignment": "center",
   "body": [
-    { "type": "Image", "url": "${tile}", "altText": "${alt}", "width": "128px", "height": "128px", "horizontalAlignment": "center" }
+    { "type": "Image", "url": "${tile}", "altText": "${alt}", "size": "stretch" }
   ]
 }

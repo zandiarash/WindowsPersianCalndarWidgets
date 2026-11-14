@@ -60,7 +60,7 @@ internal static class CardData
         switch (size)
         {
             case WidgetSize.Small:
-                data["tile"] = CardRenderer.Tile(today, now).ToDataUri();
+                data["tile"] = CardRenderer.SmallBanner(today, now, catalog).ToDataUri();
                 break;
 
             case WidgetSize.Medium:
@@ -112,7 +112,7 @@ internal static class CardData
         foreach (var theme in Enum.GetValues<CardTheme>())
         {
             var name = Key(theme);
-            Save(CardRenderer.BoardMock(theme, [CardRenderer.Tile(today, now)]), $"small-{name}.png");
+            Save(CardRenderer.BoardMock(theme, [CardRenderer.SmallBanner(today, now, catalog)]), $"small-{name}.png");
             Save(CardRenderer.BoardMock(theme, [CardRenderer.Hero(today, now, true, catalog), CardRenderer.WeekStrip(today, theme, catalog)]), $"medium-{name}.png");
 
             var nav = NavMock(today, theme);

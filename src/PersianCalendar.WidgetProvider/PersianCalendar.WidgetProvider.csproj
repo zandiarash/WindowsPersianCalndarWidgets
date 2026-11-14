@@ -35,8 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\**" />
-    <Content Include="Public\**" />
+    <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Public\**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\PersianCalendar.Desktop\Assets\Fonts\*.ttf" Link="Fonts\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="Templates\*.json" LogicalName="Templates.%(Filename)%(Extension)" />
   </ItemGroup>
